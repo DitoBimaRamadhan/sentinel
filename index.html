@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#f6f9ff">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; media-src 'self' blob:; connect-src https://openrouter.ai https://api.tavily.com https://factchecktools.googleapis.com; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<meta name="description" content="SENTINEL membantu memeriksa berita, pesan, gambar, dan tautan dengan AI dan sumber yang dapat ditelusuri.">
+<title>SENTINEL — Verifikasi Informasi</title>
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="assets/sentinel.css">
+</head>
+<body>
+<div class="topline"></div>
+<header>
+  <div class="shell nav">
+    <div class="brand">
+      <div class="logo" aria-hidden="true">
+        <svg width="25" height="25" viewBox="0 0 24 24" fill="none"><path d="M12 3 20 6v5.5c0 4.5-3.1 7.5-8 9.5-4.9-2-8-5-8-9.5V6l8-3Z" stroke="white" stroke-width="1.8"/><path d="m8 12 2.5 2.5L16 9" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <div><div class="brand-name">SENTINEL</div><div class="brand-sub" id="brandSub">RUANG VERIFIKASI INFORMASI</div></div>
+    </div>
+    <nav class="navlinks" aria-label="Navigasi utama">
+      <a href="#checker">Periksa Konten</a><a href="#sources">Sumber Referensi</a><a href="#features">Fitur</a>
+      <button class="settings-btn" id="openSettings"><span>⚙</span> Pengaturan AI</button>
+    </nav>
+  </div>
+</header>
+
+<main class="shell">
+  <section class="hero">
+    <div>
+      <div class="eyebrow"><span class="pulse"></span> INFORMASI LEBIH TERPERCAYA</div>
+      <h1>Jangan langsung percaya.<br><span style="color:var(--blue)">Periksa faktanya.</span></h1>
+      <p>Analisis berita, pesan, gambar, dan tautan media sosial dengan bantuan AI serta bukti dari sumber yang dapat ditelusuri. SENTINEL membantu memeriksa klaim, bukan sekadar menebak.</p>
+    </div>
+    <aside class="hero-card">
+      <div class="hero-card-title">Pemeriksaan informasi</div>
+      <div class="hero-stat">Periksa sebelum membagikan.</div>
+      <div class="hero-small">Setiap klaim perlu konteks, sumber, dan pemeriksaan yang sesuai.</div>
+      <div class="mini-grid">
+        <div class="mini"><b>Berita</b><span>Cek klaim</span></div>
+        <div class="mini"><b>Media</b><span>Analisis visual</span></div>
+        <div class="mini"><b>Sosial</b><span>Periksa konteks</span></div>
+      </div>
+    </aside>
+  </section>
+
+  <div class="section-head" id="checker">
+    <div><h2>Periksa sebuah konten</h2><p>Pilih jenis input, masukkan konten, lalu jalankan analisis.</p></div>
+    <span class="pill">PEMERIKSAAN BERBASIS BUKTI</span>
+  </div>
+
+  <section class="workspace">
+    <div class="card">
+      <div class="card-head">
+        <div><h3>Konten yang ingin diperiksa</h3><p>Teks, gambar, tautan, atau unggahan media sosial.</p></div>
+        <span class="pill">LANGKAH 01</span>
+      </div>
+      <div class="card-body">
+        <div class="byok-banner" id="byokBanner"><span>🔑</span><div><b>Mode bawa key sendiri.</b> Analisis butuh OpenRouter API key milikmu. Key hanya disimpan di tab ini dan dikirim langsung ke penyedia API, tidak ke server SENTINEL. <span id="keyStatus"></span></div><button class="secondary" type="button" id="bannerSettings">Isi API key</button></div>
+        <div class="tabs" role="tablist" aria-label="Jenis konten">
+          <button class="tab active" data-panel="text" role="tab" aria-selected="true"><span class="tab-icon">▤</span><strong>Teks / Pesan</strong><small>Berita & broadcast</small></button>
+          <button class="tab" data-panel="image" role="tab" aria-selected="false"><span class="tab-icon">▧</span><strong>Foto / Screenshot</strong><small>Gambar & poster</small></button>
+          <button class="tab" data-panel="url" role="tab" aria-selected="false"><span class="tab-icon">↗</span><strong>Link Berita</strong><small>URL website</small></button>
+          <button class="tab" data-panel="social" role="tab" aria-selected="false"><span class="tab-icon">◌</span><strong>Media Sosial</strong><small>X, Threads, dll.</small></button>
+        </div>
+
+        <div class="panel active" id="panel-text">
+          <label class="label" for="textInput">Teks berita atau pesan</label>
+          <textarea id="textInput" placeholder="Tempel berita, pesan WhatsApp, klaim, caption, atau komentar yang ingin diperiksa..."></textarea>
+          <div class="options-row"><button class="secondary" id="sampleText">Coba contoh</button><span class="field-note">Sertakan tanggal atau konteks jika diketahui.</span></div>
+        </div>
+
+        <div class="panel" id="panel-image">
+          <label class="label">Ambil foto langsung atau unggah gambar</label>
+          <div class="options-row" style="margin:0 0 12px">
+            <button class="primary" type="button" id="startCamera">▣ Buka Kamera</button>
+            <button class="secondary" type="button" id="switchCamera" disabled>⇄ Ganti Kamera</button>
+            <button class="secondary" type="button" id="stopCamera" disabled>Hentikan</button>
+          </div>
+          <div class="camera-box" id="cameraBox">
+            <div class="camera-stage">
+              <video id="cameraVideo" autoplay playsinline muted aria-label="Pratinjau kamera langsung"></video>
+              <div class="camera-placeholder" id="cameraPlaceholder">Pratinjau kamera akan muncul di sini.</div>
+            </div>
+            <div class="camera-controls">
+              <select id="cameraFacing" aria-label="Pilih kamera">
+                <option value="environment">Kamera belakang</option>
+                <option value="user">Kamera depan</option>
+              </select>
+              <button class="primary" type="button" id="capturePhoto" disabled>● Ambil Foto</button>
+            </div>
+          </div>
+          <div class="camera-hint">Kamera hanya aktif setelah kamu menekan “Buka Kamera” dan memberikan izin browser. Pilihan depan/belakang bergantung pada perangkat.</div>
+          <label class="label" style="margin-top:18px">Atau pilih gambar dari perangkat</label>
+          <label class="upload" for="imageInput">
+            <div class="upicon">📤</div><b>Pilih gambar atau tarik ke sini</b><p>PNG, JPG, WEBP · Screenshot, poster, meme, atau foto berita</p>
+            <div id="fileName"></div><img id="preview" class="file-preview" alt="Pratinjau gambar">
+          </label>
+          <input id="imageInput" type="file" accept="image/png,image/jpeg,image/webp" hidden>
+          <label class="label" for="imageContext">Konteks tambahan (opsional)</label>
+          <textarea id="imageContext" style="min-height:85px" placeholder="Di mana gambar ini ditemukan? Ada klaim atau tanggal tertentu?"></textarea>
+          <div class="field-note">Foto dikirim langsung dari browser ke OpenRouter untuk dianalisis oleh model vision yang dipilih. Tidak semua model mendukung gambar. Format PNG, JPG, atau WEBP, maks. 8 MB.</div>
+        </div>
+
+        <div class="panel" id="panel-url">
+          <label class="label" for="urlInput">URL artikel atau halaman web</label>
+          <input id="urlInput" type="url" placeholder="https://contoh.com/berita/...">
+          <label class="label" for="urlContext">Apa yang ingin diperiksa? (opsional)</label>
+          <textarea id="urlContext" style="min-height:90px" placeholder="Contoh: periksa klaim angka, tanggal, kutipan, atau kesesuaian judul dengan isi."></textarea>
+          <div class="field-note">Isi artikel diambil lewat Tavily Extract (butuh Tavily API key). Jika gagal atau key tidak diisi, tempel teks artikelnya di tab Teks / Pesan.</div>
+        </div>
+
+        <div class="panel" id="panel-social">
+          <label class="label" for="platform">Platform asal</label>
+          <select id="platform">
+            <option value="X / Twitter">X / Twitter</option><option value="Threads">Threads</option><option value="TikTok">TikTok</option><option value="Instagram">Instagram</option><option value="Facebook">Facebook</option><option value="YouTube">YouTube</option><option value="Reddit">Reddit</option><option value="Telegram">Telegram</option><option value="WhatsApp">WhatsApp</option><option value="Platform lain">Platform lain</option>
+          </select>
+          <label class="label" for="socialUrl">Tautan posting (opsional)</label>
+          <input id="socialUrl" type="url" placeholder="https://...">
+          <label class="label" for="socialText">Caption, teks posting, atau transkrip</label>
+          <textarea id="socialText" placeholder="Tempel isi posting, komentar, caption, atau transkrip video di sini..."></textarea>
+          <div class="field-note">SENTINEL tidak otomatis memperoleh akses ke semua konten platform. API dan izin platform tetap berlaku.</div>
+        </div>
+
+        <label class="label" for="analysisType">Jenis pemeriksaan</label>
+        <select id="analysisType">
+          <option value="fact">Verifikasi fakta / indikasi hoaks</option>
+          <option value="misleading">Kesesuaian konteks dan informasi menyesatkan</option>
+          <option value="hate">Ujaran kebencian dan konten berbahaya</option>
+          <option value="media">Indikasi manipulasi gambar / media</option>
+          <option value="all">Pemeriksaan menyeluruh</option>
+        </select>
+        <div class="run-row">
+          <button class="primary" id="analyzeBtn">✦ Analisis Konten</button>
+          <button class="secondary" id="clearBtn">Reset</button>
+        </div>
+        <div class="status-note">ⓘ Hasil analisis merupakan bantuan pemeriksaan awal. Kesimpulan faktual harus didukung bukti dan sumber yang dapat diperiksa.</div>
+      </div>
+    </div>
+
+    <aside class="side-stack">
+      <div class="card result-card" aria-live="polite">
+        <div class="result-top">
+          <div class="result-label">LANGKAH 02 · LAPORAN ANALISIS</div>
+          <div class="result-title">Hasil pemeriksaan</div>
+          <div class="result-sub">Kesimpulan, alasan, dan bukti yang tersedia.</div>
+        </div>
+        <div class="result-body">
+          <div class="empty-state" id="emptyState">
+            <div class="empty-illustration">
+              <svg width="38" height="38" viewBox="0 0 24 24" fill="none"><circle cx="10.8" cy="10.8" r="6.8" stroke="currentColor" stroke-width="1.7"/><path d="m16 16 4.3 4.3M8 10.8h5.6M10.8 8v5.6" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+            </div>
+            <h4>Belum ada konten dianalisis</h4><p>Konten yang kamu kirim akan ditampilkan di sini bersama ringkasan dan referensi bukti.</p>
+          </div>
+          <div class="result-content" id="resultContent">
+            <span class="verdict unknown" id="verdict">◷ Belum terverifikasi</span>
+            <p class="result-summary" id="summary"></p>
+            <div class="result-section"><h4>Indikator yang ditemukan</h4><div id="indicators"></div></div>
+            <div class="result-section"><h4>Sumber dan bukti</h4><div id="evidence"></div></div>
+            <div class="confidence"><span>Status pemeriksaan</span><strong id="confidence">Demo / belum diverifikasi</strong></div>
+            <div class="notice">Jangan menyimpulkan sebuah klaim benar atau salah hanya dari jumlah unggahan. Periksa bukti primer, konteks, dan tanggal sumber.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card sources-card" id="sources">
+        <div class="card-head"><div><h3>Sumber referensi</h3><p>Sumber yang dipakai atau dirujuk saat pemeriksaan.</p></div><span class="pill">DATA</span></div>
+        <div class="card-body">
+          <div class="source-row"><div class="source-icon">✓</div><div><b>Google Fact Check Tools</b><span>Pencarian klaim yang pernah diperiksa.</span></div><span class="source-status">API</span></div>
+          <div class="source-row"><div class="source-icon">ID</div><div><b>TurnBackHoax / MAFINDO</b><span>Referensi pemeriksaan fakta Indonesia.</span></div><span class="source-status">Referensi</span></div>
+          <div class="source-row"><div class="source-icon">G</div><div><b>GDELT</b><span>Penemuan dan pemetaan pemberitaan.</span></div><span class="source-status">API</span></div>
+          <div class="source-row"><div class="source-icon">↗</div><div><b>Sumber primer</b><span>Regulator, dokumen resmi, data dan publikasi asli.</span></div><span class="source-status">Bukti</span></div>
+        </div>
+      </div>
+    </aside>
+  </section>
+
+  <div class="section-head" id="features"><div><h2>Dibangun untuk pemeriksaan yang bertanggung jawab</h2><p>Analisis yang menjelaskan alasan, bukan sekadar memberi label.</p></div></div>
+  <section class="feature-grid">
+    <div class="feature"><div class="feature-icon">⌕</div><div><b>Verifikasi berbasis bukti</b><p>Mencari referensi dan menampilkan sumber yang relevan untuk diperiksa.</p></div></div>
+    <div class="feature"><div class="feature-icon">⎇</div><div><b>Multi-platform</b><p>Dirancang untuk teks, gambar, tautan, serta konten dari berbagai platform.</p></div></div>
+    <div class="feature"><div class="feature-icon">◷</div><div><b>Transparan tentang ketidakpastian</b><p>Membedakan klaim terbantahkan, didukung bukti, menyesatkan, dan belum terverifikasi.</p></div></div>
+  </section>
+</main>
+
+<footer><div class="shell footer-inner"><div><b style="color:var(--ink)">SENTINEL</b> · Pusat Verifikasi Informasi</div><div>Situs statis · API key milikmu hanya disimpan di tab browser ini dan dikirim langsung ke OpenRouter, Tavily, dan Google</div></div></footer>
+
+<div class="modal-backdrop" id="settingsModal" role="dialog" aria-modal="true" aria-labelledby="settingsTitle">
+  <div class="modal">
+    <div class="modal-head"><div><h3 id="settingsTitle">Pengaturan AI</h3><div class="field-note">Atur penyedia LLM dan strategi pencarian bukti.</div></div><button class="close" id="closeSettings" aria-label="Tutup">×</button></div>
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="span2"><label class="label" for="provider">Penyedia LLM</label><select id="provider"><option value="openrouter">OpenRouter</option></select></div>
+        <div class="span2"><label class="label" for="apiKey">OpenRouter API Key</label><input type="password" id="apiKey" placeholder="sk-or-v1-..."><div class="field-note">Wajib. Gunakan key milikmu sendiri. Key hanya dikirim langsung ke openrouter.ai.</div></div>
+        <div class="span2"><label class="label" for="model">Model LLM</label><div style="display:flex;gap:8px;align-items:center"><select id="model" style="flex:1">
+          <option value="openai/gpt-4.1-mini">OpenAI GPT-4.1 Mini</option>
+          <option value="anthropic/claude-sonnet-4.5">Anthropic Claude Sonnet 4.5</option>
+          <option value="google/gemini-2.5-flash">Google Gemini 2.5 Flash</option>
+          <option value="meta-llama/llama-4-scout">Meta Llama 4 Scout</option>
+          <option value="custom">Model lain (isi ID model)</option>
+        </select><button type="button" class="secondary" id="refreshModels" style="white-space:nowrap">Muat model</button></div><div class="field-note">Daftar dapat diperbarui dari katalog model OpenRouter.</div></div>
+        <div class="span2" id="customModelWrap" style="display:none"><label class="label" for="customModel">ID model OpenRouter</label><input type="text" id="customModel" placeholder="provider/nama-model"></div>
+        <div class="span2"><label class="label" for="tavilyKey">Tavily Search API Key (opsional)</label><input type="password" id="tavilyKey" placeholder="tvly-..."><div class="field-note">Dipakai untuk mencari sumber pembanding dan mengambil isi artikel dari URL. Hanya dikirim ke api.tavily.com.</div></div>
+        <div class="span2"><label class="label" for="factCheckKey">Google Fact Check API Key (opsional)</label><input type="password" id="factCheckKey" placeholder="Masukkan Google API key"><div class="field-note">Dipakai untuk mencari klaim yang pernah diperiksa. Aktifkan Fact Check Tools API di Google Cloud. Hanya dikirim ke factchecktools.googleapis.com.</div></div>
+        <div class="span2"><label class="label" for="searchMode">Strategi pencarian bukti</label><select id="searchMode"><option value="hybrid">Hybrid: web search + database referensi</option><option value="web">Web search saja (Tavily)</option><option value="database">Database fact-check saja (Google)</option></select></div>
+        <div><label class="label" for="modelMode">Pemilihan model</label><select id="modelMode"><option value="manual">Manual · gunakan model terpilih</option><option value="auto" disabled>Otomatis · belum tersedia</option></select></div>
+        <div><label class="label" for="temperature">Kreativitas model</label><select id="temperature"><option value="0.1">Rendah · 0.1</option><option value="0.3" selected>Seimbang · 0.3</option><option value="0.7">Tinggi · 0.7</option></select></div>
+      </div>
+      <div class="helper"><b>Bawa key sendiri (BYOK):</b> SENTINEL adalah situs statis tanpa server. Browser kamu memanggil OpenRouter, Tavily, dan Google Fact Check secara langsung, dan biaya pemakaian API ditanggung akun milikmu. Key disimpan di <b>sessionStorage</b> tab ini saja: hilang saat tab ditutup, tidak pernah dikirim ke tempat lain, dan bisa dihapus kapan saja dengan tombol di bawah.</div>
+      <div class="run-row"><button class="primary" id="saveSettings">Simpan pengaturan</button><button class="secondary" id="clearKeys">Hapus key dari browser</button><button class="secondary" id="cancelSettings">Batal</button></div>
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast" role="status"></div>
+<script src="assets/sentinel.js"></script>
+</body>
+</html>
